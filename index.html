@@ -1,0 +1,573 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="description" content="SpaSemSR for Image Super-Resolution" />
+    <meta name="keywords" content="SpaSemSR, Image Super-Resolution" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Revisiting the Perception-Distortion Trade-off with Spatial-Semantic
+      Guided Super-Resolution
+    </title>
+
+    <style>
+      .hr {
+        width: 100%;
+        height: 1px;
+        margin: 48px 0;
+        background-color: #d6dbdf;
+      }
+
+      .placeholder-box {
+        width: 100%;
+        min-height: 260px;
+        border: 2px dashed #b5b5b5;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #7a7a7a;
+        font-size: 1.05rem;
+        background: #fafafa;
+      }
+
+      .placeholder-box.small {
+        min-height: 180px;
+      }
+
+      .method-comparison-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .method-comparison-row {
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 14px;
+        background: #ffffff;
+      }
+
+      .method-comparison-pair {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .comparison-label {
+        font-size: 0.95rem;
+        color: #4a4a4a;
+        margin-bottom: 8px;
+        text-align: center;
+      }
+
+      .method-slider-box {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .slider-corner-label {
+        position: absolute;
+        top: 8px;
+        z-index: 25;
+        font-size: 0.72rem;
+        font-weight: 700;
+        line-height: 1;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.65);
+        padding: 6px 8px;
+        border-radius: 6px;
+        pointer-events: none;
+      }
+
+      .slider-corner-label.left {
+        left: 8px;
+      }
+
+      .slider-corner-label.right {
+        right: 8px;
+      }
+
+      .method-slider-box {
+        min-height: 0;
+        aspect-ratio: 1 / 1;
+      }
+
+      .results-table-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+
+      .results-table-grid img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+      }
+
+      @media (max-width: 900px) {
+        .method-comparison-pair {
+          grid-template-columns: 1fr;
+        }
+
+        .results-table-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./assets/css/bulma.min.css" />
+    <link rel="stylesheet" href="./assets/css/bulma-carousel.min.css" />
+    <link rel="stylesheet" href="./assets/css/bulma-slider.min.css" />
+    <link rel="stylesheet" href="./assets/css/fontawesome.all.min.css" />
+    <link rel="stylesheet" href="./assets/css/index.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css"
+    />
+
+    <link rel="stylesheet" href="./assets/css/style.css" />
+    <link rel="stylesheet" href="./assets/css/twentytwenty.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  </head>
+  <body>
+    <section class="hero">
+      <div class="hero-body">
+        <div class="container is-max-desktop head">
+          <div class="columns is-centered">
+            <div class="column has-text-centered head">
+              <br />
+              <h1 class="title is-1 publication-title">
+                Revisiting the Perception-Distortion Trade-off with
+                Spatial-Semantic Guided Super-Resolution
+              </h1>
+
+              <div class="is-size-4 publication-authors">
+                Dan Wang<sup>1</sup> &nbsp; Haiyan Sun<sup>2</sup> &nbsp; Shan Du<sup>3</sup> &nbsp; Z. Jane Wang<sup>3</sup><br />
+                Zhaochong An<sup>1</sup> &nbsp; Serge Belongie<sup>1</sup> &nbsp; Xinrui Cui<sup>2</sup>
+              </div>
+              <div class="is-size-4 publication-authors">
+                <sup>1</sup>University of Copenhagen &nbsp;&nbsp;
+                <sup>2</sup>University of North Texas &nbsp;&nbsp;
+                <sup>3</sup>University of British Columbia
+              </div>
+
+              <div class="column has-text-centered">
+                <div class="publication-links">
+                  <span class="link-block">
+                    <a
+                      href="https://arxiv.org/abs/2603.14112"
+                      target="_blank"
+                      class="is-size-5 external-link button is-normal is-rounded is-dark"
+                    >
+                      <span class="icon">
+                        <i class="ai ai-arxiv"></i>
+                      </span>
+                      <span>arXiv</span>
+                    </a>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!--=================Teasers==========================-->
+    <section class="hero is-small">
+      <div class="hero-body">
+        <div class="container is-max-desktop has-text-centered">
+          <style>
+            .tab_container {
+              max-width: 820px;
+              margin: 0 auto;
+            }
+            .tab_row {
+              display: grid;
+              grid-template-columns: repeat(5, 1fr);
+              gap: 8px;
+              margin-top: 12px;
+              width: 100%;
+              max-width: 800px;
+              margin-left: auto;
+              margin-right: auto;
+            }
+            .tab_column img {
+              width: 100%;
+              aspect-ratio: 1 / 1;
+              object-fit: cover;
+              cursor: pointer;
+              border: 2px solid transparent;
+              border-radius: 6px;
+              display: block;
+            }
+            .tab_column img.active-thumb {
+              border-color: #3273dc;
+            }
+            #juxtapose-embed {
+              max-width: 800px;
+              margin: 0 auto;
+            }
+          </style>
+          <div class="tab_container">
+            <div
+              id="juxtapose-embed"
+              class="twentytwenty-container"
+              data-orientation="horizontal"
+              ratio="1"
+            >
+              <div class="image">
+                <img
+                  id="jg-lr"
+                  src="./assets/images/user_samples/136_lr.png"
+                  alt="LR"
+                />
+              </div>
+              <div class="image">
+                <img
+                  id="jg-hr"
+                  src="./assets/images/user_samples/136_hr.png"
+                  alt="HR"
+                />
+              </div>
+            </div>
+            <div><div id="juxtapose-hidden"></div></div>
+            <div id="imgtext"></div>
+          </div>
+
+          <div class="tab_row">
+            <div class="tab_column">
+              <img
+                id="thumb-0"
+                src="./assets/images/user_samples/008_lr.png"
+                onclick="tab_gallery_click(0);"
+              />
+            </div>
+            <div class="tab_column">
+              <img
+                id="thumb-1"
+                src="./assets/images/user_samples/136_lr.png"
+                onclick="tab_gallery_click(1);"
+              />
+            </div>
+            <div class="tab_column">
+              <img
+                id="thumb-2"
+                src="./assets/images/user_samples/116_lr.png"
+                onclick="tab_gallery_click(2);"
+              />
+            </div>
+            <div class="tab_column">
+              <img
+                id="thumb-3"
+                src="./assets/images/user_samples/006_lr.png"
+                onclick="tab_gallery_click(3);"
+              />
+            </div>
+            <div class="tab_column">
+              <img
+                id="thumb-4"
+                src="./assets/images/user_samples/103_lr.png"
+                onclick="tab_gallery_click(4);"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-fifty-sixths">
+            <div class="content">
+              <img
+                src="./assets/images/teaser_1.png"
+                alt="Teaser"
+                style="width: 100%; border-radius: 8px"
+              />
+              <p style="margin-top: 0.9rem; font-size: 0.98rem; line-height: 1.55; text-align: left;">
+                Perception-distortion trade-off in
+                <span style="color: rgb(0,112,192); font-weight: 600">GAN-based</span>,
+                <span style="color: rgb(78,167,46); font-weight: 600">Diffusion-based</span>, and
+                <span style="color: rgb(192,0,0); font-weight: 700"><i>Ours</i></span>:
+                GAN-based methods reduce distortion but produce blurry textures,
+                while diffusion-based methods generate perceptually sharp yet
+                hallucinated details. By integrating spatial-grounded textual guidance,
+                SpaSemSR improves reconstruction fidelity (PSNR, SSIM in (a)), while
+                semantic-enhanced visual guidance enhances perceptual quality
+                (CLIP-IQA, MUSIQ, MANIQA in (b)), resulting in a better
+                perception-distortion trade-off compared with GAN-based (c)
+                and diffusion-based models (d).
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-fifty-sixths">
+            <h2 class="title is-3">Abstract</h2>
+            <div class="content has-text-justified">
+              <p>
+                Image super-resolution (SR) aims to reconstruct high resolution
+                images with both high perceptual quality and low distortion, but
+                is fundamentally limited by the perception–distortion trade-off.
+                GAN-based SR methods reduce distortion but still struggle with
+                realistic fine-grained textures, whereas diffusion-based
+                approaches synthesize rich details but often deviate from the
+                input, hallucinating structures and degrading fidelity. This
+                tension raises a key challenge: how to exploit the powerful
+                generative priors of diffusion models without sacrificing
+                fidelity. To address this, we propose <b>SpaSemSR</b>, a
+                spatial–semantic guided diffusion framework with two
+                complementary guidances. First,
+                <b>spatial-grounded textual guidance</b> integrates object-level
+                spatial cues with semantic prompts, aligning textual and visual
+                structures to reduce distortion. Second,
+                <b>semantic-enhanced visual guidance</b> with a multi-encoder
+                design and semantic degradation constraints unifies multimodal
+                semantic priors, improving perceptual realism under severe
+                degradations. These complementary guidances are adaptively fused
+                into the diffusion process via spatial-semantic attention,
+                suppressing distortion and hallucination while retaining the
+                strengths of diffusion models. Extensive experiments on multiple
+                benchmarks show that SpaSemSR achieves a superior
+                perception-distortion balance, producing both realistic and
+                faithful restorations.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-fifty-sixths">
+            <h2 class="title is-3">Method</h2>
+            <div class="content has-text-justified">
+              <p>
+                We propose SpaSemSR, a Spatial-Semantic guided SR framework that
+                steers diffusion with two complementary forms of guidance:
+                <b>(a)</b> <i>Spatial-grounded textual guidance</i>, which
+                integrates semantic prompts with object-level spatial cues,
+                improving fidelity by aligning text semantics with visual
+                structure; <b>(b)</b> <i>Semantic-enhanced visual guidance</i>,
+                which extracts semantic-enhanced features from degraded LR
+                inputs under semantic degradation constraints, improving
+                perceptual realism. These guidances are fused in <b>(c)</b> the
+                proposed <i>Spatial-Semantic ControlNet</i> via parallel
+                cross-attention and integrated into <b>(d)</b> our
+                <i>Spatial-Semantic guided Diffusion model</i>, where they
+                adaptively modulate the generative prior. By integrating
+                spatial-grounded textual and semantic-enhanced visual guidance,
+                SpaSemSR achieves reconstructions that are both perceptually
+                realistic and faithful to the ground truth, effectively
+                balancing the perception-distortion trade-off.
+              </p>
+            </div>
+
+            <div class="content" style="margin-top: 1.25rem">
+              <img
+                src="./assets/images/framework_overview.png"
+                alt="Method Overview"
+                style="width: 100%; border-radius: 8px"
+              />
+            </div>
+
+            <div class="content" style="margin-top: 1rem">
+              <h3 class="title is-4">Results</h3>
+              <div class="results-table-grid">
+                <img src="./assets/images/table1.png" alt="Results Table 1" />
+                <img src="./assets/images/table2.png" alt="Results Table 2" />
+              </div>
+            </div>
+
+            <div class="content" style="margin-top: 1.5rem">
+              <h3 class="title is-4">Visual Comparisons</h3>
+              <div class="method-comparison-grid">
+                <div class="method-comparison-row">
+                  <div class="method-comparison-pair">
+                    <div>
+                      <div class="twentytwenty-container method-slider-box method-compare-slider" data-orientation="horizontal">
+                        <span class="slider-corner-label left">GAN-based method</span>
+                        <span class="slider-corner-label right">SpaSemSR</span>
+                        <div class="image">
+                          <img src="./assets/images/user_samples/Nikon_046/RealESRGAN.png" alt="RealESRGAN Nikon_046" />
+                        </div>
+                        <div class="image">
+                          <img src="./assets/images/user_samples/Nikon_046/ours.png" alt="Ours Nikon_046" />
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="twentytwenty-container method-slider-box method-compare-slider" data-orientation="horizontal">
+                        <span class="slider-corner-label left">SpaSemSR</span>
+                        <span class="slider-corner-label right">Diffusion-based method</span>
+                        <div class="image">
+                          <img src="./assets/images/user_samples/Nikon_046/ours.png" alt="Ours Nikon_046" />
+                        </div>
+                        <div class="image">
+                          <img src="./assets/images/user_samples/Nikon_046/XPSR.png" alt="XPSR Nikon_046" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="method-comparison-row">
+                  <div class="method-comparison-pair">
+                    <div>
+                      <div class="twentytwenty-container method-slider-box method-compare-slider" data-orientation="horizontal">
+                        <span class="slider-corner-label left">GAN-based method</span>
+                        <span class="slider-corner-label right">SpaSemSR</span>
+                        <div class="image">
+                          <img src="./assets/images/user_samples/Nikon_050/RealESRGAN.png" alt="RealESRGAN Nikon_050" />
+                        </div>
+                        <div class="image">
+                          <img src="./assets/images/user_samples/Nikon_050/ours.png" alt="Ours Nikon_050" />
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="twentytwenty-container method-slider-box method-compare-slider" data-orientation="horizontal">
+                        <span class="slider-corner-label left">SpaSemSR</span>
+                        <span class="slider-corner-label right">Diffusion-based method</span>
+                        <div class="image">
+                          <img src="./assets/images/user_samples/Nikon_050/ours.png" alt="Ours Nikon_050" />
+                        </div>
+                        <div class="image">
+                          <img src="./assets/images/user_samples/Nikon_050/XPSR.png" alt="XPSR Nikon_050" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="method-comparison-row">
+                  <div class="method-comparison-pair">
+                    <div>
+                      <div class="twentytwenty-container method-slider-box method-compare-slider" data-orientation="horizontal">
+                        <span class="slider-corner-label left">GAN-based method</span>
+                        <span class="slider-corner-label right">SpaSemSR</span>
+                        <div class="image">
+                          <img src="./assets/images/user_samples/panasonic_57/RealESRGAN.png" alt="RealESRGAN panasonic_57" />
+                        </div>
+                        <div class="image">
+                          <img src="./assets/images/user_samples/panasonic_57/ours.png" alt="Ours panasonic_57" />
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="twentytwenty-container method-slider-box method-compare-slider" data-orientation="horizontal">
+                        <span class="slider-corner-label left">SpaSemSR</span>
+                        <span class="slider-corner-label right">Diffusion-based method</span>
+                        <div class="image">
+                          <img src="./assets/images/user_samples/panasonic_57/ours.png" alt="Ours panasonic_57" />
+                        </div>
+                        <div class="image">
+                          <img src="./assets/images/user_samples/panasonic_57/XPSR.png" alt="XPSR panasonic_57" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="columns is-centered">
+        <div class="column is-8">
+          <div class="content">
+            <div class="columns is-centered">
+              <p style="font-size: 1.5em">
+                This website is adapted from the following
+                <a
+                  href="https://github.com/nerfies/nerfies.github.io"
+                  target="_blank"
+                  >source code</a
+                >.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="./assets/js/bulma-carousel.min.js"></script>
+    <script src="./assets/js/bulma-slider.min.js"></script>
+    <script src="./assets/js/index.js"></script>
+    <script src="./assets/js/jquery.event.move.js"></script>
+    <script src="./assets/js/jquery.twentytwenty.js"></script>
+    <script>
+      const JG_PAIRS = [
+        {
+          lr: "./assets/images/user_samples/008_lr.png",
+          hr: "./assets/images/user_samples/008_hr.png",
+        },
+        {
+          lr: "./assets/images/user_samples/136_lr.png",
+          hr: "./assets/images/user_samples/136_hr.png",
+        },
+        {
+          lr: "./assets/images/user_samples/116_lr.png",
+          hr: "./assets/images/user_samples/116_hr.png",
+        },
+        {
+          lr: "./assets/images/user_samples/006_lr.png",
+          hr: "./assets/images/user_samples/006_hr.png",
+        },
+        {
+          lr: "./assets/images/user_samples/103_lr.png",
+          hr: "./assets/images/user_samples/103_hr.png",
+        },
+      ];
+
+      function remount_juxtapose() {
+        const el = $("#juxtapose-embed");
+        el.find(".twentytwenty-overlay, .twentytwenty-handle").remove();
+        el.twentytwenty({ default_offset_pct: 0.5 });
+      }
+
+      function tab_gallery_click(i) {
+        const p = JG_PAIRS[i];
+        $("#jg-lr").attr("src", p.lr);
+        $("#jg-hr").attr("src", p.hr);
+        $(".tab_column img").removeClass("active-thumb");
+        $("#thumb-" + i).addClass("active-thumb");
+        setTimeout(remount_juxtapose, 30);
+      }
+
+      function init_method_sliders() {
+        $(".method-compare-slider").each(function () {
+          const $el = $(this);
+          $el.find(".twentytwenty-overlay, .twentytwenty-handle").remove();
+          $el.twentytwenty({ default_offset_pct: 0.5 });
+        });
+      }
+
+      $(function () {
+        remount_juxtapose();
+        tab_gallery_click(0);
+        init_method_sliders();
+      });
+    </script>
+  </body>
+</html>
